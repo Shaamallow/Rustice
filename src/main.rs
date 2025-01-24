@@ -55,13 +55,18 @@ async fn main() {
                     return;
                 }
             };
+
+            println!("Running {} model now", model);
             // Then set up a task with a prompt and constraints
             let llm = Llama::new_chat().await.unwrap();
             let task = llm.task("Tu es un juriste qui explique quels sont les changements de chaque arret")
                 .with_constraints(Arc::new(Response::new_parser()));
 
             // Finally, run the task
+            println!("Getting response now");
             let response = task("Donne moi chaque arret et numero correspondant avec une petite description : {content_file}").await.unwrap();
+
+            println!("Done with response");
             println!("{:?}", response);
         }
         Commands::Mesure => {
