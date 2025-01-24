@@ -1,24 +1,13 @@
 mod loader;
 use loader::load_file_content;
 
-use std::path::PathBuf;
+mod article;
+use article::{Article, EXAMPLE_INPUT, EXAMPLE_OUTPUT};
+
 use clap::{Parser, Subcommand};
-use tokio;
 use kalosm::language::*;
-use std::sync::Arc;
-
-// First, derive an efficient parser for your structured data
-#[derive(Parse, Clone, Debug)]
-enum Class {
-    Arret,
-    Numero,
-    Commentaire
-}
-
-#[derive(Parse, Clone, Debug)]
-struct Response {
-    classification: Class,
-}
+use std::path::PathBuf;
+use tokio;
 
 #[derive(Parser)]
 #[command(name = "juridique")]
@@ -37,6 +26,10 @@ enum Commands {
         model: String,
     },
     Mesure,
+    Unstructured {
+        #[arg(short, long, value_name = "INPUT_FOLDER")]
+        input_folder: PathBuf,
+    },
 }
 
 #[tokio::main]
@@ -44,8 +37,14 @@ async fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Process { input_folder, model } => {
-            println!("Processing with model {} on folder {:?}", model, input_folder);
+        Commands::Process {
+            input_folder,
+            model,
+        } => {
+            println!(
+                "Processing with model {} on folder {:?}",
+                model, input_folder
+            );
 
             // Call a loader and processing logic here
             let content_file = match load_file_content(input_folder) {
@@ -56,23 +55,64 @@ async fn main() {
                 }
             };
 
-            println!("Running {} model now", model);
+            println!("Content Loaded, now running model...");
+
             // Then set up a task with a prompt and constraints
-            let llm = Llama::new_chat().await.unwrap();
-            let task = llm.task("Tu es un juriste qui explique quels sont les changements de chaque arret")
-                .with_constraints(Arc::new(Response::new_parser()));
+            let llm = Llama::builder()
+                .with_source(LlamaSource::phi_3_mini_4k_instruct())
+                .build()
+                .await
+                .unwrap();
 
-            // Finally, run the task
-            println!("Getting response now");
-            let response = task("Donne moi chaque arret et numero correspondant avec une petite description : {content_file}").await.unwrap();
+            let task = llm
+                .task("You are a Jurist. Please extract the article number, date, and content of the legal text.")
+                .with_example(EXAMPLE_INPUT, EXAMPLE_OUTPUT)
+                .typed();
 
-            println!("Done with response");
-            println!("{:?}", response);
+            // Run the task
+            println!("Getting response");
+            let mut stream =
+                task.run(format!("Extract the relevant informations (article number, date, content) from the following content. If you find no date, give back 0000-00-00 {}", content_file));
+
+            stream.to_std_out().await.unwrap();
+            let article: Article = stream.await.unwrap();
+
+            println!("{}", article.to_string());
         }
         Commands::Mesure => {
             println!("Running metrics measurement...");
             // Call metric calculation logic here
         }
+        Commands::Unstructured { input_folder } => {
+            println!("Processing with model on folder {:?}", input_folder);
+
+            // Call a loader and processing logic here
+            let content_file = match load_file_content(input_folder) {
+                Ok(content) => content,
+                Err(e) => {
+                    eprintln!("Error loading file content: {}", e);
+                    return;
+                }
+            };
+
+            println!("Content Loaded, now running model...");
+
+            // Then set up a task with a prompt and constraints
+            let llm = Llama::builder()
+                .with_source(LlamaSource::phi_3_mini_4k_instruct())
+                .build()
+                .await
+                .unwrap();
+
+            let task = llm
+                .task("You are a Jurist. Please extract the article number, date, and content of the legal text.");
+
+            // Run the task
+            println!("Getting response");
+            let mut stream =
+                task.run(format!("Extract the relevant informations (article number, date, content) from the following content {}", content_file));
+
+            stream.to_std_out().await.unwrap();
+        }
     }
 }
-
