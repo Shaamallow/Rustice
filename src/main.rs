@@ -25,11 +25,7 @@ enum Commands {
         #[arg(short, long, value_name = "MODEL")]
         model: String,
     },
-    Mesure,
-    Unstructured {
-        #[arg(short, long, value_name = "INPUT_FOLDER")]
-        input_folder: PathBuf,
-    },
+    Mesure
 }
 
 #[tokio::main]
@@ -82,37 +78,6 @@ async fn main() {
         Commands::Mesure => {
             println!("Running metrics measurement...");
             // Call metric calculation logic here
-        }
-        Commands::Unstructured { input_folder } => {
-            println!("Processing with model on folder {:?}", input_folder);
-
-            // Call a loader and processing logic here
-            let content_file = match load_file_content(input_folder) {
-                Ok(content) => content,
-                Err(e) => {
-                    eprintln!("Error loading file content: {}", e);
-                    return;
-                }
-            };
-
-            println!("Content Loaded, now running model...");
-
-            // Then set up a task with a prompt and constraints
-            let llm = Llama::builder()
-                .with_source(LlamaSource::phi_3_mini_4k_instruct())
-                .build()
-                .await
-                .unwrap();
-
-            let task = llm
-                .task("You are a Jurist. Please extract the article number, date, and content of the legal text.");
-
-            // Run the task
-            println!("Getting response");
-            let mut stream =
-                task.run(format!("Extract the relevant informations (article number, date, content) from the following content {}", content_file));
-
-            stream.to_std_out().await.unwrap();
         }
     }
 }
