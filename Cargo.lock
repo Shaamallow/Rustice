@@ -337,7 +337,7 @@ dependencies = [
  "bitflags 2.7.0",
  "cexpr",
  "clang-sys",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "regex",
@@ -1945,7 +1945,7 @@ source = "git+https://github.com/s3bk/glyphmatcher#7bd5d40aaa8893fa4f2e07c758fa3
 dependencies = [
  "font",
  "istring 0.4.2",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "pathfinder_content",
  "pathfinder_geometry",
  "pdf_encoding 0.4.0 (git+https://github.com/pdf-rs/encoding)",
@@ -2672,7 +2672,7 @@ dependencies = [
 [[package]]
 name = "kalosm"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "arroy",
  "async-trait",
@@ -2701,7 +2701,7 @@ dependencies = [
 [[package]]
 name = "kalosm-common"
 version = "0.3.3"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -2719,7 +2719,7 @@ dependencies = [
 [[package]]
 name = "kalosm-language"
 version = "0.3.3"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "anyhow",
  "arroy",
@@ -2771,7 +2771,7 @@ dependencies = [
 [[package]]
 name = "kalosm-language-model"
 version = "0.3.3"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "anyhow",
  "async-lock",
@@ -2793,7 +2793,7 @@ dependencies = [
 [[package]]
 name = "kalosm-llama"
 version = "0.3.3"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -2818,7 +2818,7 @@ dependencies = [
 [[package]]
 name = "kalosm-ocr"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -2837,7 +2837,7 @@ dependencies = [
 [[package]]
 name = "kalosm-parse-macro"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2847,7 +2847,7 @@ dependencies = [
 [[package]]
 name = "kalosm-sample"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "kalosm-parse-macro",
  "regex-automata 0.4.9",
@@ -2856,7 +2856,7 @@ dependencies = [
 [[package]]
 name = "kalosm-sound"
 version = "0.3.4"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "byteorder",
  "candle-core",
@@ -2885,7 +2885,7 @@ dependencies = [
 [[package]]
 name = "kalosm-streams"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "futures-util",
  "image 0.24.9",
@@ -2896,7 +2896,7 @@ dependencies = [
 [[package]]
 name = "kalosm-vision"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "image 0.24.9",
  "kalosm-ocr",
@@ -2977,7 +2977,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if 1.0.0",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -3885,7 +3885,7 @@ dependencies = [
  "image 0.24.9",
  "instant",
  "istring 0.4.2",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "log",
  "once_cell",
  "pathfinder_color",
@@ -3904,7 +3904,7 @@ version = "0.1.0"
 source = "git+https://github.com/pdf-rs/pdf_text#fbe582d29ad4af5a4f84f6098352fcc033be6127"
 dependencies = [
  "font",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "log",
  "ordered-float",
  "pathfinder_color",
@@ -4367,7 +4367,7 @@ dependencies = [
 [[package]]
 name = "rbert"
 version = "0.3.3"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -4601,6 +4601,7 @@ name = "rustice"
 version = "0.1.0"
 dependencies = [
  "clap 4.5.26",
+ "indicatif",
  "kalosm",
  "serde",
  "serde_json",
@@ -4670,7 +4671,7 @@ checksum = "f7c45b9784283f1b2e7fb61b42047c2fd678ef0960d4f6f1eba131594cc369d4"
 [[package]]
 name = "rwhisper"
 version = "0.3.5"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "byteorder",
  "candle-core",
@@ -4695,7 +4696,7 @@ dependencies = [
 [[package]]
 name = "rwuerstchen"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -4793,7 +4794,7 @@ dependencies = [
 [[package]]
 name = "segment-anything-rs"
 version = "0.3.2"
-source = "git+https://github.com/floneum/floneum#3214cacf9dfa9a16773dd69e386ddda47b061301"
+source = "git+https://github.com/floneum/floneum#55719fe61fff4ba6613e6f379d992e221af4b46c"
 dependencies = [
  "candle-core",
  "candle-nn",

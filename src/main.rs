@@ -5,8 +5,10 @@ mod article;
 use article::{Article, EXAMPLE_INPUT, EXAMPLE_OUTPUT};
 
 use clap::{Parser, Subcommand};
+use indicatif::{ProgressBar, ProgressStyle};
 use kalosm::language::*;
 use std::path::PathBuf;
+use std::sync::Arc;
 use tokio;
 
 #[derive(Parser)]
@@ -25,22 +27,26 @@ enum Commands {
         #[arg(short, long, value_name = "MODEL")]
         model: String,
     },
-    Mesure
+    Mesure,
 }
 
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
+    let pb = Arc::new(ProgressBar::new_spinner());
+    pb.set_style(
+        ProgressStyle::default_spinner()
+            .template("{spinner:.green} {msg}")
+            .unwrap(),
+    );
+    pb.enable_steady_tick(std::time::Duration::from_millis(100));
 
     match &cli.command {
         Commands::Process {
             input_folder,
             model,
         } => {
-            println!(
-                "Processing with model {} on folder {:?}",
-                model, input_folder
-            );
+            pb.set_message("Loading file content...");
 
             // Call a loader and processing logic here
             let content_file = match load_file_content(input_folder) {
@@ -51,8 +57,7 @@ async fn main() {
                 }
             };
 
-            println!("Content Loaded, now running model...");
-
+            pb.set_message("Building LLM model...");
             // Then set up a task with a prompt and constraints
             let llm = Llama::builder()
                 .with_source(LlamaSource::phi_3_mini_4k_instruct())
@@ -60,20 +65,29 @@ async fn main() {
                 .await
                 .unwrap();
 
+            pb.set_message("Creating task...");
             let task = llm
                 .task("You are a Jurist. Please extract the article number, date, and content of the legal text.")
                 .with_example(EXAMPLE_INPUT, EXAMPLE_OUTPUT)
-                .typed();
+                .with_constraints(Arc::new(Article::new_parser()));
+            // .typed();
+
+            pb.set_message("LLM is thinking...");
 
             // Run the task
-            println!("Getting response");
-            let mut stream =
-                task.run(format!("Extract the relevant informations (article number, date, content) from the following content. If you find no date, give back 0000-00-00 {}", content_file));
+            let llm_thread = task.run(format!("Extract the relevant informations (article number, date, content) from the following content: {}", content_file));
 
-            stream.to_std_out().await.unwrap();
-            let article: Article = stream.await.unwrap();
+            // let _ = llm_thread.to_std_out().await;
 
-            println!("{}", article.to_string());
+            match llm_thread.await {
+                Ok(article) => {
+                    pb.finish_with_message("Response: ");
+                    println!("\n{}", article.to_string());
+                }
+                Err(e) => {
+                    eprintln!("Error processing content: {}", e);
+                }
+            }
         }
         Commands::Mesure => {
             println!("Running metrics measurement...");
