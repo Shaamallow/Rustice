@@ -70,14 +70,11 @@ async fn main() {
                 .task("You are a Jurist. Please extract the article number, date, and content of the legal text.")
                 .with_example(EXAMPLE_INPUT, EXAMPLE_OUTPUT)
                 .with_constraints(Arc::new(Article::new_parser()));
-            // .typed();
 
             pb.set_message("LLM is thinking...");
 
             // Run the task
             let llm_thread = task.run(format!("Extract the relevant informations (article number, date, content) from the following content: {}", content_file));
-
-            // let _ = llm_thread.to_std_out().await;
 
             match llm_thread.await {
                 Ok(article) => {
