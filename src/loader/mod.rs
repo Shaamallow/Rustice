@@ -1,6 +1,6 @@
 use std::fs;
-use std::path::PathBuf;
 use std::io::{self, Read};
+use std::path::PathBuf;
 
 pub fn load_file_content(input_path: &PathBuf) -> Result<String, io::Error> {
     // Open the file and read the content into a String
@@ -27,4 +27,3 @@ mod tests {
         assert_eq!(content.trim(), "Test content");
     }
 }
-

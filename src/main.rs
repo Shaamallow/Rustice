@@ -4,6 +4,9 @@ use loader::load_file_content;
 mod article;
 use article::{Article, EXAMPLE_INPUT, EXAMPLE_OUTPUT};
 
+mod models;
+use models::Model;
+
 use clap::{Parser, Subcommand};
 use indicatif::{ProgressBar, ProgressStyle};
 use kalosm::language::*;
@@ -25,7 +28,7 @@ enum Commands {
         #[arg(short, long, value_name = "INPUT_FOLDER")]
         input_folder: PathBuf,
         #[arg(short, long, value_name = "MODEL")]
-        model: String,
+        model: Model,
     },
     Mesure,
 }
@@ -57,15 +60,17 @@ async fn main() {
                 }
             };
 
-            pb.set_message("Building LLM model...");
+            pb.finish_with_message("Building LLM model...");
             // Then set up a task with a prompt and constraints
+
             let llm = Llama::builder()
-                .with_source(LlamaSource::phi_3_mini_4k_instruct())
+                .with_source(model.get_llama_source())
                 .build()
                 .await
                 .unwrap();
 
             pb.set_message("Creating task...");
+
             let task = llm
                 .task("You are a Jurist. Please extract the article number, date, and content of the legal text.")
                 .with_example(EXAMPLE_INPUT, EXAMPLE_OUTPUT)

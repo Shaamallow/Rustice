@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use clap::{Parser, Subcommand};
 use kalosm::language::*;
 use serde::Deserialize;
@@ -21,7 +22,6 @@ impl ToString for ArticleType {
 
 #[derive(Parse, Clone, Debug, Schema, Deserialize)]
 pub struct Article {
-
     #[parse(pattern = r"[a-zA-Z,.?!\d ]+")]
     pub reasoning: String,
 
