@@ -1,10 +1,9 @@
-mod loader;
-use loader::load_file_content;
-
 mod article;
-use article::{Article, EXAMPLE_INPUT, EXAMPLE_OUTPUT};
-
+mod commands;
 mod models;
+
+use commands::{parse_html_file_in_batch, process_files_in_batch};
+
 use models::Model;
 
 use clap::{Parser, Subcommand};
@@ -27,10 +26,21 @@ enum Commands {
     Process {
         #[arg(short, long, value_name = "INPUT_FOLDER")]
         input_folder: PathBuf,
+        #[arg(short, long, value_name = "OUTPUT_FOLDER")]
+        output_folder: PathBuf,
         #[arg(short, long, value_name = "MODEL")]
         model: Model,
+        #[arg(short, long, value_name = "N_THREADS", default_value = "1")]
+        n_threads: usize,
     },
-    Mesure,
+    ParseHTML {
+        #[arg(short, long, value_name = "INPUT_FOLDER")]
+        input_folder: PathBuf,
+        #[arg(short, long, value_name = "OUTPUT_FOLDER")]
+        output_folder: PathBuf,
+        #[arg(short, long, value_name = "N_THREADS", default_value = "1")]
+        n_threads: usize,
+    },
 }
 
 #[tokio::main]
@@ -47,20 +57,11 @@ async fn main() {
     match &cli.command {
         Commands::Process {
             input_folder,
+            output_folder,
             model,
+            n_threads,
         } => {
-            pb.set_message("Loading file content...");
-
-            // Call a loader and processing logic here
-            let content_file = match load_file_content(input_folder) {
-                Ok(content) => content,
-                Err(e) => {
-                    eprintln!("Error loading file content: {}", e);
-                    return;
-                }
-            };
-
-            pb.finish_with_message("Building LLM model...");
+            pb.set_message("Building LLM model...");
             // Then set up a task with a prompt and constraints
 
             let llm = Llama::builder()
@@ -69,31 +70,45 @@ async fn main() {
                 .await
                 .unwrap();
 
-            pb.set_message("Creating task...");
+            pb.finish_with_message("Processing batch");
 
-            let task = llm
-                .task("You are a Jurist. Please extract the article number, date, and content of the legal text.")
-                .with_example(EXAMPLE_INPUT, EXAMPLE_OUTPUT)
-                .with_constraints(Arc::new(Article::new_parser()));
-
-            pb.set_message("LLM is thinking...");
-
-            // Run the task
-            let llm_thread = task.run(format!("Extract the relevant informations (article number, date, content) from the following content: {}", content_file));
-
-            match llm_thread.await {
-                Ok(article) => {
-                    pb.finish_with_message("Response: ");
-                    println!("\n{}", article.to_string());
-                }
+            match process_files_in_batch(
+                &llm,
+                &input_folder,
+                &output_folder,
+                pb.clone(),
+                n_threads.clone(),
+            )
+            .await
+            {
+                Ok(_) => pb.finish_with_message("Batch processing completed successfully."),
                 Err(e) => {
-                    eprintln!("Error processing content: {}", e);
+                    pb.finish_with_message("Error during batch processing.");
+                    eprintln!("Error: {}", e);
                 }
             }
         }
-        Commands::Mesure => {
-            println!("Running metrics measurement...");
-            // Call metric calculation logic here
+        Commands::ParseHTML {
+            input_folder,
+            output_folder,
+            n_threads,
+        } => {
+            pb.set_message("Parsing HTML files...");
+
+            match parse_html_file_in_batch(
+                &input_folder,
+                &output_folder,
+                pb.clone(),
+                n_threads.clone(),
+            )
+            .await
+            {
+                Ok(_) => pb.finish_with_message("Batch parsing completed successfully."),
+                Err(e) => {
+                    pb.finish_with_message("Error during batch parsing.");
+                    eprintln!("Error: {}", e);
+                }
+            }
         }
     }
 }
