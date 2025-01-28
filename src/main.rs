@@ -26,12 +26,20 @@ enum Commands {
     Process {
         #[arg(short, long, value_name = "INPUT_FOLDER")]
         input_folder: PathBuf,
+        #[arg(short, long, value_name = "OUTPUT_FOLDER")]
+        output_folder: PathBuf,
         #[arg(short, long, value_name = "MODEL")]
         model: Model,
+        #[arg(short, long, value_name = "N_THREADS", default_value = "1")]
+        n_threads: usize,
     },
     ParseHTML {
         #[arg(short, long, value_name = "INPUT_FOLDER")]
         input_folder: PathBuf,
+        #[arg(short, long, value_name = "OUTPUT_FOLDER")]
+        output_folder: PathBuf,
+        #[arg(short, long, value_name = "N_THREADS", default_value = "1")]
+        n_threads: usize,
     },
 }
 
@@ -49,7 +57,9 @@ async fn main() {
     match &cli.command {
         Commands::Process {
             input_folder,
+            output_folder,
             model,
+            n_threads,
         } => {
             pb.set_message("Building LLM model...");
             // Then set up a task with a prompt and constraints
@@ -62,7 +72,15 @@ async fn main() {
 
             pb.finish_with_message("Processing batch");
 
-            match process_files_in_batch(&llm, input_folder, pb.clone()).await {
+            match process_files_in_batch(
+                &llm,
+                &input_folder,
+                &output_folder,
+                pb.clone(),
+                n_threads.clone(),
+            )
+            .await
+            {
                 Ok(_) => pb.finish_with_message("Batch processing completed successfully."),
                 Err(e) => {
                     pb.finish_with_message("Error during batch processing.");
@@ -70,10 +88,21 @@ async fn main() {
                 }
             }
         }
-        Commands::ParseHTML { input_folder } => {
+        Commands::ParseHTML {
+            input_folder,
+            output_folder,
+            n_threads,
+        } => {
             pb.set_message("Parsing HTML files...");
 
-            match parse_html_file_in_batch(&input_folder, pb.clone()).await {
+            match parse_html_file_in_batch(
+                &input_folder,
+                &output_folder,
+                pb.clone(),
+                n_threads.clone(),
+            )
+            .await
+            {
                 Ok(_) => pb.finish_with_message("Batch parsing completed successfully."),
                 Err(e) => {
                     pb.finish_with_message("Error during batch parsing.");
